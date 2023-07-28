@@ -1,33 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { FormEvent, useState } from 'react'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+interface ToDoList{
+  id: number,
+  text: string,
+  confirm: boolean
+}
 
+
+function App() {
+  const [newItem, setNewItem] = useState('')
+  const [todoList, setTodoList] = useState<ToDoList[]>([])
+
+  function TodoList(e: FormEvent){
+    e.preventDefault()
+    setTodoList((current)=>{
+      return [...current,{id:1,text:newItem,confirm: true}]
+    })
+  }
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <form onSubmit={TodoList}>
+      <h1>To do list</h1>
+      <input type="text" placeholder='write' value={newItem} onChange={e => setNewItem(e.target.value)}/>
+      <button>Add</button>
+    </form>
+     
+      {todoList.map((item) =>{
+        return<div className='todo-list'>
+          <label >
+            <input type='checkbox' checked={item.confirm}/>
+            {item.text}
+          </label>
+          <button >Delete</button>
+
+        </div>
+      })}
     </>
   )
 }
