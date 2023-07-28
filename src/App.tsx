@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react'
 import './App.css'
 
 interface ToDoList{
-  id: number,
+  id: string,
   text: string,
   confirm: boolean
 }
@@ -14,17 +14,21 @@ function App() {
 
   function TodoList(e: FormEvent){
     e.preventDefault()
+
     setTodoList((current)=>{
-      return [...current,{id:Number(crypto.randomUUID()),text:newItem,confirm: true}]
+      return [...current,{id: crypto.randomUUID(),text:newItem,confirm: true}]
     })
+
   }
 
-  function deleteTodo(id : number){
+  function deleteTodo(id : string){
+    
     setTodoList((current)=>{
         return current.filter((item)=>{
           item.id !== id
         })
     })
+    
   }
   return (
     <>
@@ -33,10 +37,10 @@ function App() {
       <input type="text" placeholder='write' value={newItem} onChange={e => setNewItem(e.target.value)}/>
       <button>Add</button>
     </form>
-      {todoList.map((item) =>{
-        return<div className='todo-list'>
-          <label key={item.id}>
-            <input type='checkbox' checked={item.confirm}/>
+    {todoList.map((item) =>{
+        return<div className='todo-list' key={item.id}>
+          <label >
+            <input type='checkbox' defaultChecked={item.confirm}/>
             {item.text}
           </label>
           <button onClick={()=>deleteTodo(item.id)}>Delete</button>
