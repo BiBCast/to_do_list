@@ -5,7 +5,7 @@ import { addDoc, collection } from "firebase/firestore";
 import { firestore } from "./config/firebase";
 
 function App() {
-  const messageRef = useRef<HTMLInputElement>();
+  /* const messageRef = useRef<HTMLInputElement>();
   const ref = collection(firestore, "prova");
   function handleSave(e: React.SyntheticEvent) {
     e.preventDefault();
@@ -16,14 +16,10 @@ function App() {
     } catch (e) {
       console.log(e);
     }
-  }
+  } */
   return (
     <>
-      <form onSubmit={handleSave}>
-        <label htmlFor="text"></label>
-        <input id="text" type="text" ref={messageRef} />
-        <button type="submit">Save</button>
-      </form>
+      <Todo />
     </>
   );
 }

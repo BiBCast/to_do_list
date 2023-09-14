@@ -1,37 +1,71 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import React from "react";
+import { firestore } from "../config/firebase";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+} from "firebase/firestore";
 
 interface ToDoList {
   id: string;
-  text: string;
-  confirm: boolean;
+  text?: string;
+  confirm?: boolean;
 }
 
 export function Todo() {
   const [newItem, setNewItem] = useState("");
   const [todoList, setTodoList] = useState<ToDoList[]>([]);
+  const todoCollectionRef = collection(firestore, "TODO");
+  const getData = async () => {
+    try {
+      const data = await getDocs(todoCollectionRef);
+      const filteredData = data.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setTodoList(filteredData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  useEffect(() => {
+    getData();
+  }, []);
 
-  function TodoList(e: FormEvent) {
+  function FormHandler(e: FormEvent) {
     e.preventDefault();
+    const addTodo = async () => {
+      try {
+        await addDoc(todoCollectionRef, {
+          text: newItem,
+          confirm: true,
+        });
+        getData();
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    addTodo();
 
-    setTodoList((current) => {
+    /* setTodoList((current) => {
       return [
         ...current,
         { id: crypto.randomUUID(), text: newItem, confirm: true },
       ];
-    });
+    }); */
   }
 
-  function deleteTodo(id: string) {
-    setTodoList((current) => {
-      return current.filter((item) => {
-        return item.id !== id;
-      });
-    });
-  }
+  const deleteTodo = async (id: string) => {
+    const todo = doc(todoCollectionRef, id);
+    await deleteDoc(todo);
+    getData();
+  };
   return (
     <>
-      <form onSubmit={TodoList}>
+      <form onSubmit={FormHandler}>
         <h1>To do list</h1>
         <input
           type="text"
