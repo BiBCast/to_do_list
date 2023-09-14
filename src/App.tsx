@@ -1,57 +1,29 @@
-import { FormEvent, useState } from "react";
+import { FormEventHandler, useRef } from "react";
 import "./App.css";
-
-interface ToDoList {
-  id: string;
-  text: string;
-  confirm: boolean;
-}
+import { Todo } from "./components/Todo";
+import { addDoc, collection } from "firebase/firestore";
+import { firestore } from "./config/firebase";
 
 function App() {
-  const [newItem, setNewItem] = useState("");
-  const [todoList, setTodoList] = useState<ToDoList[]>([]);
-
-  function TodoList(e: FormEvent) {
+  const messageRef = useRef<HTMLInputElement>();
+  const ref = collection(firestore, "prova");
+  function handleSave(e: React.SyntheticEvent) {
     e.preventDefault();
+    console.log(messageRef.current?.value);
 
-    setTodoList((current) => {
-      return [
-        ...current,
-        { id: crypto.randomUUID(), text: newItem, confirm: true },
-      ];
-    });
-  }
-
-  function deleteTodo(id: string) {
-    setTodoList((current) => {
-      return current.filter((item) => {
-        return item.id !== id;
-      });
-    });
+    try {
+      addDoc(ref, { "prova ": messageRef.current?.value });
+    } catch (e) {
+      console.log(e);
+    }
   }
   return (
     <>
-      <form onSubmit={TodoList}>
-        <h1>To do list</h1>
-        <input
-          type="text"
-          placeholder="write"
-          value={newItem}
-          onChange={(e) => setNewItem(e.target.value)}
-        />
-        <button>Add</button>
+      <form onSubmit={handleSave}>
+        <label htmlFor="text"></label>
+        <input id="text" type="text" ref={messageRef} />
+        <button type="submit">Save</button>
       </form>
-      {todoList.map((item) => {
-        return (
-          <div className="todo-list" key={item.id}>
-            <label>
-              <input type="checkbox" defaultChecked={item.confirm} />
-              {item.text}
-            </label>
-            <button onClick={() => deleteTodo(item.id)}>Delete</button>
-          </div>
-        );
-      })}
     </>
   );
 }
